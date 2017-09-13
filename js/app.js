@@ -1,64 +1,53 @@
     var map;
+      // Create a new blank array for all the listing markers.
+  var markers = [];
+     
+var initialData = [
+            {title:'Colosseum', location: {lat: 41.8902, lng: 12.4922}, type: 'Ancient Ruins'}, 
+            {title:'Campo de Fiori', location: {lat: 41.8956, lng: 12.4722}, type: 'Markets'}, 
+            {title:'Santa Maria in Trastevere', location: {lat: 41.8895, lng: 12.4697}, type: 'Churches'},
+            {title: 'Basilica de San Clemente al Laterano', location: {lat: 41.8893, lng: 12.4976}, type: 'Churches'},
+            ];
 
-     var markers = [];
+  function initMap() {
+        // Constructor creates a new map - only center and zoom are required.
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 41.9028, lng: 12.4964},
+          zoom: 13,
+          mapTypeControl: false
+        });
 
-     var placeMarkers = [];
+ var largeInfowindow = new google.maps.InfoWindow();
 
-     function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), 
-          {
-        center: {lat: 39.7392, lng: -104.9903 },
-        zoom: 9
-      });
-      
-      //Create a searchbox 
-     var searchBox = new google.maps.places.SearchBox(
-          document.getElementById('places-search'));
-     searchBox.setBounds(map.getBounds());
-       
-     var locations = [
-      {title: 'UC Health', location: {lat: 39.742336, lng: -104.841558}},
-      {title: 'Childrens Hospital', location: {lat: 39.22222, lng: -104.222222}}
-      ];
+ var bounds = new google.maps.LatLngBounds();
 
-     var largeInfowindow = new google.maps.InfoWindow();
-
-      //initialize the drawing manager
-     var drawingManager = new google.maps.drawing.DrawingManager();
-      drawingManager.setMap(map);
+        // The following group uses the location array to create an array of markers on initialize.
+        for (var i = 0; i < initialData.length; i++) {
+          // Get the position from the location array.
+          var position = initialData[i].location;
+          var title = initialData[i].title;
+          // Create a marker per location, and put into markers array.
+          var marker = new google.maps.Marker({
+            map: map,
+            position: position,
+            title: title,
+            animation: google.maps.Animation.DROP,
+            id: i
+          });
+          // Push the marker to our array of markers.
+          markers.push(marker);
+          // Create an onclick event to open an infowindow at each marker.
+          marker.addListener('click', function() {
+            populateInfoWindow(this, largeInfowindow);
+          });
+          bounds.extend(markers[i].position);
+        }
+        // Extend the boundaries of the map for each marker
+        map.fitBounds(bounds);
+      }
     
         
-      
-      //The following group uses the location array to create an array of markers on initialize
-      for (var i = 0; i < locations.length; i++) {
-        var position = locations[i].location;
-        var title = locations[i].title;
-        var marker = new google.maps.Marker({
-          position: position,
-          title: title,
-          animation: google.maps.Animation.DROP
-        });
-        //Push the marker to our array of markers
-        markers.push(marker);
-    
-        //Create an onclick event to open an infowindow at each marker
-        marker.addListener('click', function() {
-          populateInfoWindow(this, largeInfowindow);
-        });
-      }
-     
-      document.getElementById('show-hospitals').addEventListener('click', showHospitals);
-      document.getElementById('hide-hospitals').addEventListener('click', hideHospitals);
-    };
-
-      //event listener for searchbox
-      searchBox.addListener('places_changed', function(){
-        searchBoxPlaces(this);
-      });
-
-      document.getElementById('go-places').addEventListener('click', textSearchPlaces);
-
-      //This function populates the infowindow when the marker clicked
+     //This function populates the infowindow when the marker clicked
       function populateInfoWindow(marker, infowindow) {
         //check to make sure the infowindow is not already opened on this marker
         if (infowindow.marker != marker) {
@@ -72,46 +61,78 @@
         }
       }
 
-      function showHospitals() {
-        var bounds = new google.maps.LatLngBounds();
-        //extend the boundaries of the map for each marker and display the marker
-        for (var i = 0; i < markers.length; i++) {
-          markers[i].setMap(map);
-          bounds.extend(markers[i].position);
-        }
-        map.fitBounds(bounds);
-      }
+    var Sight = function(data) {
+      this.title = ko.observable(data.title);
+    };
+    
+    var ViewModel = function() {
+      var self = this;
+      var marker;
 
-      function hideMarkers(markers) {
-        for (var i = 0; i < markers.length; i++) {
-          markers[i].setMap(null);
-      }
-    }
+      self.sightList = [];
 
-     // This function fires when the user selects a searchbox picklist item.
-      // It will do a nearby search using the selected query string or place.
-      function searchBoxPlaces(searchBox) {
-        hideMarkers(placeMarkers);
-        var places = searchBox.getPlaces();
-        // For each place, get the icon, name and location.
-        createMarkersForPlaces(places);
-        if (places.length == 0) {
-          window.alert('We did not find any places matching that search!');
-        }
-      }
+      initialData.forEach(function(place) {
+        self.sightList.push(new Place(place));
+      });
 
-      // This function firest when the user select "go" on the places search.
-      // It will do a nearby search using the entered query string or place.
-      function textSearchPlaces() {
-        var bounds = map.getBounds();
-        hideMarkers(placeMarkers);
-        var placesService = new google.maps.places.PlacesService(map);
-        placesService.textSearch({
-          query: document.getElementById('places-search').value,
-          bounds: bounds
-        }, function(results, status) {
-          if (status === google.maps.places.PlacesServiceStatus.OK) {
-            createMarkersForPlaces(results);
-          }
-        });
+    // Build Markers via the Maps API and place them on the map.
+    self.sightList.forEach(function(place) {
+    var markerOptions = {
+      map: self.googleMap,
+      position: place.location
+    };
+    
+    //place.marker = new google.maps.Marker(markerOptions);
+    
+    // You might also add listeners onto the marker, such as "click" listeners.
+  });
+    self.visibleSights = ko.observableArray();
+
+    self.sightList.forEach(function(place) {
+    self.visibleSights.push(place);
+      });
+
+     // This, along with the data-bind on the <input> element, lets KO keep 
+    // constant awareness of what the user has entered. It stores the user's 
+   // input at all times.
+    self.userInput = ko.observable('');
+
+    // The filter will look at the names of the places the Markers are standing
+  // for, and look at the user input in the search box. If the user input string
+  // can be found in the place name, then the place is allowed to remain 
+  // visible. All other markers are removed.
+  self.filterMarkers = function() {
+    var searchInput = self.userInput().toLowerCase();
+    
+    self.visibleSights.removeAll();
+    
+    // This looks at the name of each places and then determines if the user
+    // input can be found within the place name.
+    self.sightList.forEach(function(place) {
+      location.marker.setVisible(false);
+      
+      if (place.title.toLowerCase().indexOf(searchInput) !== -1) {
+        console.log(place);
+        self.visibleSights.push(place);
       }
+    });
+    
+    
+    self.visibleSights().forEach(function(place) {
+      place.marker.setVisible(true);
+    });
+  };
+  
+  
+  function Place(dataObj) {
+    this.title = dataObj.title;
+    this.location = dataObj.location;
+    
+    // You will save a reference to the Places' map marker after you build the
+    // marker:
+    this.marker = null;
+  }
+  
+};
+
+  ko.applyBindings(new ViewModel())
