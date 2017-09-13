@@ -1,113 +1,117 @@
-  var map;
-      // Create a new blank array for all the listing markers.
-  var markers = [];
+    var map;
 
-  var initialData = {
-    filters: ["None", "Ancient Ruins", "Markets", "Churches"],
-    items: [{title:'Colosseum', type: 'Ancient Ruins'}, 
-            {title:'Campo de Fiori', type: 'Markets'}, 
-            {title:'Santa Maria in Trastevere', type: 'Churches'},
-            {title: 'Basilica de San Clemente al Laterano', type: 'Churches'},
-            ],
-        };
+     var markers = [];
 
-  var locations = [
-          {title: 'Colosseum', location: {lat: 41.8902, lng: 12.4922}},
-          {title: 'Campo de Fiori', location: {lat: 41.8956, lng: 12.4722}},
-          {title: 'Santa Maria in Trastevere', location: {lat: 41.8895, lng: 12.4697}},
-          {title: 'Basilica de San Clemente al Laterano', location: {lat: 41.8893, lng: 12.4976}}
-        ];
+     var placeMarkers = [];
 
-      function initMap() {
-        // Constructor creates a new map - only center and zoom are required.
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 41.9028, lng: 12.4964},
-          zoom: 13,
-          mapTypeControl: false
+     function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), 
+          {
+        center: {lat: 39.7392, lng: -104.9903 },
+        zoom: 9
+      });
+      
+      //Create a searchbox 
+     var searchBox = new google.maps.places.SearchBox(
+          document.getElementById('places-search'));
+     searchBox.setBounds(map.getBounds());
+       
+     var locations = [
+      {title: 'UC Health', location: {lat: 39.742336, lng: -104.841558}},
+      {title: 'Childrens Hospital', location: {lat: 39.22222, lng: -104.222222}}
+      ];
+
+     var largeInfowindow = new google.maps.InfoWindow();
+
+      //initialize the drawing manager
+     var drawingManager = new google.maps.drawing.DrawingManager();
+      drawingManager.setMap(map);
+    
+        
+      
+      //The following group uses the location array to create an array of markers on initialize
+      for (var i = 0; i < locations.length; i++) {
+        var position = locations[i].location;
+        var title = locations[i].title;
+        var marker = new google.maps.Marker({
+          position: position,
+          title: title,
+          animation: google.maps.Animation.DROP
         });
-
-        
-        
-        var largeInfowindow = new google.maps.InfoWindow();
-        // The following group uses the location array to create an array of markers on initialize.
-        for (var i = 0; i < locations.length; i++) {
-          // Get the position from the location array.
-          var position = locations[i].location;
-          var title = locations[i].title;
-          // Create a marker per location, and put into markers array.
-           var marker = new google.maps.Marker({
-            position: position,
-            title: title,
-            animation: google.maps.Animation.DROP,
-            id: i
-          });
-          // Push the marker to our array of markers.
-          markers.push(marker);
-          // Create an onclick event to open an infowindow at each marker.
-          marker.addListener('click', function() {
-            populateInfoWindow(this, largeInfowindow);
-          });
-        }
-        document.getElementById('show-sights').addEventListener('click', showSights);
-        document.getElementById('hide-sights').addEventListener('click', hideSights);
+        //Push the marker to our array of markers
+        markers.push(marker);
+    
+        //Create an onclick event to open an infowindow at each marker
+        marker.addListener('click', function() {
+          populateInfoWindow(this, largeInfowindow);
+        });
       }
-      // This function populates the infowindow when the marker is clicked. We'll only allow
-      // one infowindow which will open at the marker that is clicked, and populate based
-      // on that markers position.
+     
+      document.getElementById('show-hospitals').addEventListener('click', showHospitals);
+      document.getElementById('hide-hospitals').addEventListener('click', hideHospitals);
+    };
+
+      //event listener for searchbox
+      searchBox.addListener('places_changed', function(){
+        searchBoxPlaces(this);
+      });
+
+      document.getElementById('go-places').addEventListener('click', textSearchPlaces);
+
+      //This function populates the infowindow when the marker clicked
       function populateInfoWindow(marker, infowindow) {
-        // Check to make sure the infowindow is not already opened on this marker.
+        //check to make sure the infowindow is not already opened on this marker
         if (infowindow.marker != marker) {
           infowindow.marker = marker;
-          infowindow.setContent('<div>' + marker.title + '</div>');
+          infowindow.setContent('<div>' + marker.position + '<div>');
           infowindow.open(map, marker);
-          // Make sure the marker property is cleared if the infowindow is closed.
+          //Make sure the marker property is cleared if the infowindow is closed
           infowindow.addListener('closeclick', function() {
-            infowindow.marker = null;
+            infowindow.setMarker(null);
           });
         }
       }
-      // This function will loop through the markers array and display them all.
-      function showSights() {
+
+      function showHospitals() {
         var bounds = new google.maps.LatLngBounds();
-        // Extend the boundaries of the map for each marker and display the marker
+        //extend the boundaries of the map for each marker and display the marker
         for (var i = 0; i < markers.length; i++) {
           markers[i].setMap(map);
           bounds.extend(markers[i].position);
         }
         map.fitBounds(bounds);
       }
-      // This function will loop through the listings and hide them all.
-      function hideSights() {
+
+      function hideMarkers(markers) {
         for (var i = 0; i < markers.length; i++) {
           markers[i].setMap(null);
+      }
+    }
+
+     // This function fires when the user selects a searchbox picklist item.
+      // It will do a nearby search using the selected query string or place.
+      function searchBoxPlaces(searchBox) {
+        hideMarkers(placeMarkers);
+        var places = searchBox.getPlaces();
+        // For each place, get the icon, name and location.
+        createMarkersForPlaces(places);
+        if (places.length == 0) {
+          window.alert('We did not find any places matching that search!');
         }
-      };
+      }
 
-  var Sights = function(data) {
-    this.title = ko.observable(data.items);
-  }
-
-  this.sightList = ko.observableArray([]);
-
-    initialData.items.forEach(function(sightItem) {
-    self.sightList.push( new Sights(sightItem) );
-  });
-
- var ViewModel = function(data) {
-    var self = this;
-    self.filters = ko.observableArray(data.filters);
-    self.filter = ko.observable('');
-    self.items = ko.observableArray(data.items);
-    self.filteredItems = ko.computed(function() {
-        var filter = self.filter();
-        if (!filter || filter == "None") {
-            return self.items();
-        } else {
-            return ko.utils.arrayFilter(self.items(), function(i) {
-                return i.type == filter;
-            });
-        }
-    });
-  };
-
-  ko.applyBindings(new ViewModel(initialData));
+      // This function firest when the user select "go" on the places search.
+      // It will do a nearby search using the entered query string or place.
+      function textSearchPlaces() {
+        var bounds = map.getBounds();
+        hideMarkers(placeMarkers);
+        var placesService = new google.maps.places.PlacesService(map);
+        placesService.textSearch({
+          query: document.getElementById('places-search').value,
+          bounds: bounds
+        }, function(results, status) {
+          if (status === google.maps.places.PlacesServiceStatus.OK) {
+            createMarkersForPlaces(results);
+          }
+        });
+      }
