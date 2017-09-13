@@ -1,7 +1,13 @@
     var map;
       // Create a new blank array for all the listing markers.
   var markers = [];
-     
+   function initMap() {
+        // Constructor creates a new map - only center and zoom are required.
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 41.9028, lng: 12.4964},
+          zoom: 13,
+          mapTypeControl: false
+        });  
 var initialData = [
             {title:'Colosseum', location: {lat: 41.8902, lng: 12.4922}, type: 'Ancient Ruins'}, 
             {title:'Campo de Fiori', location: {lat: 41.8956, lng: 12.4722}, type: 'Markets'}, 
@@ -9,13 +15,7 @@ var initialData = [
             {title: 'Basilica de San Clemente al Laterano', location: {lat: 41.8893, lng: 12.4976}, type: 'Churches'},
             ];
 
-  function initMap() {
-        // Constructor creates a new map - only center and zoom are required.
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 41.9028, lng: 12.4964},
-          zoom: 13,
-          mapTypeControl: false
-        });
+  
 
  var largeInfowindow = new google.maps.InfoWindow();
 
