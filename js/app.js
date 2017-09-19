@@ -1,149 +1,182 @@
- var locationData = [
-  {
-    locationName: 'Colosseum',
-    latLng: {lat: 41.8902, lng: 12.4922},
-  },
-  
-  {
-    locationName: 'Campo de Fiori',
-    latLng: {lat: 41.8956, lng: 12.4722}
-  },
-  
-  {
-    locationName: 'Santa Maria in Trastevere',
-    latLng: {lat: 41.8895, lng: 12.4697}
-  }
-];
+ //filter works and markers on init but markers don't filter
+
+  var map;
+  var marker;
+  var largeInfowindow;
+  var bounds;    
+  var initialData = [
+            {title:'Colosseum', LatLng: {lat: 41.8902, lng: 12.4922}, type: 'Ancient Ruins'}, 
+            {title:'Campo de Fiori', LatLng: {lat: 41.8956, lng: 12.4722}, type: 'Markets'}, 
+            {title:'Santa Maria in Trastevere', LatLng: {lat: 41.8895, lng: 12.4697}, type: 'Churches'},
+            {title: 'Basilica de San Clemente al Laterano', LatLng: {lat: 41.8893, lng: 12.4976}, type: 'Churches'},
+            ];
+
+
+
+
+
+ //sights class
+ var Location = function(data) {
+  this.title = ko.observable(data.title);
+  this.LatLng = ko.observable(data.LatLng);
+  this.type = ko.observable(data.type);
+  this.visible = ko.observable(true);
+ };
+
+ 
+ 
+
+  var ViewModel = function() {
+    var self = this;
+    self.currentSight = ko.observable();
+
+    //create empty filter list array
+    self.filterList = [];
+
+    initialData.map( location => {
+      if (!self.filterList.includes(location.type)) {
+        self.filterList.push(location.type);
+      }
+    });
+    self.locationsArray = ko.observableArray(initialData);
+    self.type = ko.observableArray(self.filterList);
+    self.selectedCategory = ko.observable();
+
+   //filters the list of sights 
+    self.filteredItems = ko.computed(() => {
+        if (!self.selectedCategory() ) {
+          self.locationsArray().forEach(function(location) {
+            if(location.marker) {
+              location.marker.setVisible(true);
+            }
+          });
+          return self.locationsArray();
+        } else {
+          largeInfowindow.close();
+          return ko.utils.arrayFilter(self.locationsArray(), location => {
+            var match = location.type === self.selectedCategory();
+            location.marker.setVisible(match);
+            return match;
+          });
+        }
+      });
+
+    self.getVenues = function( location) {
+       map.setZoom( 16 );
+        map.setCenter( location.marker.getPosition() );
+       // google.maps.event.trigger( location.marker, 'click' );
+           if ( location.marker.getAnimation() !== null ) {
+                    location.marker.setAnimation( null );
+                } else {
+                    location.marker.setAnimation( google.maps.Animation.BOUNCE );
+                    setTimeout(function(){ location.marker.setAnimation(null); }, 1400);  // stop after 2 bounces
+                }
+                // reset content 
+                 largeInfowindow.setContent('');
+                        largeInfowindow.open( map, location.marker ); 
+
+      
+$.ajax( {
+            url: 'https://api.foursquare.com/v2/venues/search?ll=' + location.LatLng.lat + ',' + location.LatLng.lng + '&intent=match&name=' + location.title + '&client_id=JMBQJXEH5V0OWT1WJ4SI0HROBCEE2NZRPWDNRYZQ4ENK3RVF&client_secret=ZWZC2S3KW4XAN33HJHCMY0L1Q0X5MOKELZHS4SVI5J5CM25D&v=20170526'
+        } ).done( function( data ) {
+            var venue = data.response.venues[ 0 ];
+            //set fetched info as properties of location object
+            location.id = ko.observable( venue.id );
+            // use id to get photo
+            $.ajax( {
+                url: 'https://api.foursquare.com/v2/venues/' + location.id() + '?oauth_token=R5YPRIGI1HFJXM15BEWHFGKPVIJBTXJOKK5BMODOQFZFB115&v=20170530'
+            } ).done( function( data ) {
+                // set first photo url as the location photo property
+                var photos = data.response.venue.photos.groups[ "0" ].items || "there is no photo";
+                var url = data.response.venue.url || 'No url provided';
+                var name = data.response.venue.name || 'No name provided';
+                var rating = data.response.venue.rating || 'No rating provided';
+            
+                largeInfowindow.setContent( '<div class="infowindow"><h6>' + name + '</h6> Rating: ' + '<span class="rating">' + rating + '</span>' + '<img class="sq" src="' + photos[ 0 ].prefix + 'width200' + photos[ 0 ].suffix + '"><h8> Website <a class="web-links" href="http://' + url + '" target="_blank">' + url + '</a>' + ' </h8></div>' );
+                // set current location and scroll user to information
+                self.scrollTo( '#map' );
+            } ).fail( function( err ) {
+                // if there is an error, set error status 
+                alert( "Sorry, there is an error to view the information" );
+            } );
+        } ).fail( function( err ) {
+            // if there is an error, set error status
+            alert( "Sorry, there is an error to view the information" );
+        } );
+    }; // end getVenues 
+    self.scrollTo = function( el ) {
+        $( 'html, body' ).animate( {
+            scrollTop: $( el ).offset().top
+        }, "slow" );
+    };
+}; 
+
+
 
 function initMap() {
         // Constructor creates a new map - only center and zoom are required.
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 41.9028, lng: 12.4964},
+        var mapCreate = {
+          center: new google.maps.LatLng (41.9028, 12.4964),
           zoom: 13,
           mapTypeControl: false
-        });
+        };
 
-
-  var largeInfowindow = new google.maps.InfoWindow();  
-        
- var bounds = new google.maps.LatLngBounds();    
-
-var ViewModel = function() {
-  var self = this;
-  
-
-  
-  //Build the Google Map object. Store a reference to it.
-  self.googleMap = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 41.9028, lng: 12.4964},
-    zoom: 13
-  });
-  
-  
-  // Build "Place" objects out of raw place data. It is common to receive place
-  // data from an API like FourSquare. Place objects are defined by a custom
-  // constructor function you write, which takes what you need from the original
-  // data and also lets you add on anything else you need for your app, not
-  // limited by the original data.
-  self.allPlaces = [];
-  locationData.forEach(function(place) {
-    self.allPlaces.push(new Place(place));
-  });
-  
-  
-  // Build Markers via the Maps API and place them on the map.
-  self.allPlaces.forEach(function(place) {
-    var markerOptions = {
-      map: self.googleMap,
-      position: place.latLng
-
-
-    };
-    
-    place.marker = new google.maps.Marker(markerOptions);
-
-    
-    // You might also add listeners onto the marker, such as "click" listeners.
-  });
-
-
-  
-  
-  // This array will contain what its name implies: only the markers that should
-  // be visible based on user input. My solution does not need to use an 
-  // observableArray for this purpose, but other solutions may require that.
-  self.visiblePlaces = ko.observableArray();
-  
-  
-  // All places should be visible at first. We only want to remove them if the
-  // user enters some input which would filter some of them out.
-  self.allPlaces.forEach(function(place) {
-    self.visiblePlaces.push(place);
-  });
-  
-  
-  // This, along with the data-bind on the <input> element, lets KO keep 
-  // constant awareness of what the user has entered. It stores the user's 
-  // input at all times.
-  self.userInput = ko.observable('');
-  
-  
-  // The filter will look at the names of the places the Markers are standing
-  // for, and look at the user input in the search box. If the user input string
-  // can be found in the place name, then the place is allowed to remain 
-  // visible. All other markers are removed.
-  self.filterMarkers = function() {
-    var searchInput = self.userInput().toLowerCase();
-    
-    self.visiblePlaces.removeAll();
-    
-    // This looks at the name of each places and then determines if the user
-    // input can be found within the place name.
-    self.allPlaces.forEach(function(place) {
-      place.marker.setVisible(false);
-      
-      if (place.locationName.toLowerCase().indexOf(searchInput) !== -1) {
-        self.visiblePlaces.push(place);
-      }
-    });
-    
-    
-    self.visiblePlaces().forEach(function(place) {
-      place.marker.setVisible(true);
-    });
-  };
-  
-  
-  function Place(dataObj) {
-    this.locationName = dataObj.locationName;
-    this.latLng = dataObj.latLng;
-    
-    // You will save a reference to the Places' map marker after you build the
-    // marker:
-    this.marker = null;
-  }
-  
-};
-
-
-
-          
-        
-//This function populates the infowindow when the marker clicked
-      function populateInfoWindow(marker, infowindow) {
-        //check to make sure the infowindow is not already opened on this marker
-        if (infowindow.marker != marker) {
-          infowindow.marker = marker;
-          infowindow.setContent('<div>' + "yes" + '<div>');
-          infowindow.open(map, marker);
-          //Make sure the marker property is cleared if the infowindow is closed
-          infowindow.addListener('closeclick', function() {
-            infowindow.setMarker(null);
-          });
-        }
-      }
-
-
-ko.applyBindings(new ViewModel());
+        map = new google.maps.Map(document.getElementById("map"), mapCreate);
+        largeInfowindow = new google.maps.InfoWindow();
+        showMarkers(vm.locationsArray());
 }
 
+
+
+  function showMarkers( locations ) {
+    var markers = [];
+    bounds = new google.maps.LatLngBounds();
+    //  
+    // The following group uses the location array to create an array of markers on initialize.
+    for ( var i = 0; i < locations.length; i++ ) {
+        // Get the position from the location array.
+        var position = locations[ i ].LatLng;
+        var title = locations[ i ].name;
+        // Create a marker per location, and put into markers array.
+        marker = new google.maps.Marker( {
+            map: map,
+            position: position,
+            title: title,
+            animation: google.maps.Animation.DROP,
+            id: i
+        } );
+        // Push the marker to our array of markers.
+        markers.push( marker );
+        vm.locationsArray()[ i ].marker = marker;
+        // click handler for google maps marker
+        google.maps.event.addListener( marker, 'click', ( function( location, vm ) {
+            return function() {
+                // tell viewmodel to show this place
+                map.setZoom( 16 );
+                map.setCenter( location.marker.getPosition() );
+                vm.getVenues( location );
+                
+            };
+        } )( locations[ i ], vm ) );
+        //google.maps.event.addListener(marker, 'click', mv.clickListener());
+        bounds.extend( markers[ i ].position );
+    }
+
+}
+  
+
+
+  var vm = new ViewModel();
+  ko.applyBindings(vm);
+  
+
+
+  
+
+
+
+
+ 
+  
+  
+  

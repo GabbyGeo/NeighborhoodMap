@@ -1,40 +1,108 @@
-<!DOCTYPE html>
-<html >
-<head>
-  <meta charset="UTF-8">
-  <title>Sights of Rome</title>
-  
-  
-  
-      <link rel="stylesheet" href="css/style.css">
+<!-- This is the corresponding "starter code" for 04_Hello Map in Udacity and Google's Maps
+API Course, Lesson 1 -->
+<html>
+ <head>
+ <!-- styles put here, but you can include a CSS file and reference it instead! -->
+   <style type="text/css">
+     html, body { height: 100%; margin: 0; padding: 0; }
+     #map { height: 100%; }
+     box-sizing: border-box;
+}
 
-  
-</head>
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 
-<body>
+#map {
+  height: 100%;
+}
+
+input {
+  position: fixed;
+  right: 20px;
+  bottom: 30%;
+  height: 40px;
+  width: 200px;
+  font-size: 20px;
+}
+
+#list-view {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 100px;
+  background-color: #fff;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  margin-left: 20px;
+  padding: 2px 0;
+  font: 12px sans-serif;
+}
+      .dropbtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 16px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+   </style>
+ </head>
+ <body>
+  <!DOCTYPE html>
   <html>
-
   <head>
     <script async defer
-        src="https://maps.googleapis.com/maps/api/js?libraries=places,drawing&key=AIzaSyA7qQ_KrnFKINbcQK_Z7iBSjoTnAw7_ES4&v=3&callback=initMap">
-         
+        src="https://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&key=AIzaSyA7qQ_KrnFKINbcQK_Z7iBSjoTnAw7_ES4&v=3&callback=initMap">
+
    </script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
    <script src="js/lib/knockout-3.2.0.js"></script>
   </head>
-
   <body>
-    <div id="map"></div>
-    <input type="search" placeholder="keyword search..." data-bind="textInput: userInput, event: {keyup: filterMarkers}">
-    
-    <ul id="list-view" data-bind="foreach: visiblePlaces">
-      <li data-bind="text: locationName"></li>
-    </ul>
-    
-  </body>
-
-</html>
   
-    <script src="js/app.js"></script>
-
-</body>
+   <div class="container">
+    <div class="options-box">
+      <h1>Highlights of Rome</h1>
+        <h4>Filter</h4>
+        <div>
+          <div class="form-group">
+              <select id="" class="form-control" data-bind="options: type,
+              optionsCaption: 'Choose a category',
+              value: selectedCategory">
+              </select>
+              </div>
+        <div class="form-group">
+             <ul data-bind="foreach: filteredItems" id="Location-list">
+             <li data-bind="text: $data.title, click: $parent.getVenues"></li>
+             </ul>
+             </div>
+        <!--select data-bind="options: filters, value: filterList">
+          </select><br>
+        <br>
+        <strong>Sights</strong>
+        <ul data-bind="foreach: filteredItems">
+        <li data-bind="text: title"></li>
+        </ul>                      
+        </div>
+        <div data-bind="filteredLocation" id="Location-list">
+          <h2 data-bind="text: title""></h2-->
+        </div>
+      </div>
+      <div id="map"></div>
+      
+    
+   
+   </div>
+   </body>
+   </html>
+   
+   <script src="js/app.js"></script>
+ </body>
 </html>
