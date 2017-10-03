@@ -2,57 +2,7 @@
 API Course, Lesson 1 -->
 <html>
  <head>
- <!-- styles put here, but you can include a CSS file and reference it instead! -->
-   <style type="text/css">
-     html, body { height: 100%; margin: 0; padding: 0; }
-     #map { height: 100%; }
-     box-sizing: border-box;
-}
 
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-#map {
-  height: 100%;
-}
-
-input {
-  position: fixed;
-  right: 20px;
-  bottom: 30%;
-  height: 40px;
-  width: 200px;
-  font-size: 20px;
-}
-
-#list-view {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 100px;
-  background-color: #fff;
-  margin: 0;
-  padding: 0;
-}
-
-li {
-  margin-left: 20px;
-  padding: 2px 0;
-  font: 12px sans-serif;
-}
-      .dropbtn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 16px;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
-        }
-   </style>
  </head>
  <body>
   <!DOCTYPE html>
@@ -64,45 +14,47 @@ li {
    </script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
    <script src="js/lib/knockout-3.2.0.js"></script>
+   <link rel="stylesheet" href="CSS/style.css">
+   
   </head>
   <body>
   
    <div class="container">
     <div class="options-box">
       <h1>Highlights of Rome</h1>
-        <h4>Filter</h4>
+      
+      <a id="menu" class="header__menu">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M2 6h20v3H2zm0 5h20v3H2zm0 5h20v3H2z"/>
+          </svg>
+        </a>
+
+        <h4 class="Filter">Filter</h4>
+
         <div>
+
           <div class="form-group">
               <select id="" class="form-control" data-bind="options: type,
               optionsCaption: 'Choose a category',
               value: selectedCategory">
               </select>
               </div>
+        <nav id="drawer" class="nav">
         <div class="form-group">
              <ul data-bind="foreach: filteredItems" id="Location-list">
              <li data-bind="text: $data.title, click: $parent.getVenues"></li>
              </ul>
-             </div>
-        <!--select data-bind="options: filters, value: filterList">
-          </select><br>
-        <br>
-        <strong>Sights</strong>
-        <ul data-bind="foreach: filteredItems">
-        <li data-bind="text: title"></li>
-        </ul>                      
-        </div>
-        <div data-bind="filteredLocation" id="Location-list">
-          <h2 data-bind="text: title""></h2-->
+            </div>
+        </nav>
         </div>
       </div>
-      <div id="map"></div>
       
-    
-   
+  
    </div>
    </body>
    </html>
    
    <script src="js/app.js"></script>
+  
  </body>
 </html>
