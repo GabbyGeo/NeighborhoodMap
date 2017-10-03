@@ -116,8 +116,8 @@ $.ajax( {
 function initMap() {
         // Constructor creates a new map - only center and zoom are required.
         var mapCreate = {
-          center: new google.maps.LatLng (41.9028, 12.4964),
-          zoom: 13,
+          center: new google.maps.LatLng (41.8899, 12.4964),
+          zoom: 12,
           mapTypeControl: false
         };
 
