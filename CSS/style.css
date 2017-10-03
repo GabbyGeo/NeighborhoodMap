@@ -1,9 +1,6 @@
-html, 
-body { 
-  height: 100%; 
-  width: 100%;
-  margin: 0; 
-  padding: 0; 
+.content {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .header__menu {
@@ -11,18 +8,20 @@ body {
   }
 
 #map {
-  height: 100%;
+  height: 100%; 
 }
 
 .options-box {
   background-color: #6699ff;
 }
 
-.filter {
-  font-size: 18px;
-}
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 549px) {
+.header__title {
+    margin-left: 0;
+    font-size: 2em;
+    vertical-align: bottom; 
+  }
 .nav {
     z-index: 10;
     background-color: #fff;
@@ -46,6 +45,7 @@ body {
   }
 .header__menu {
     display: inline-block;
+    vertical-align: top;
     position: absolute;
     right: 0;
     padding: 1em;
@@ -60,10 +60,13 @@ body {
   .filter {
     display: none;
   }
+  .map {
+    height: 100%;
+  }
 }
 
-@media screen and (min-width: 850px) {
-  main, .nav, .form-group {
+@media screen and (min-width: 550px) {
+  main, .header__inner, .nav, .form-group, #map, .filter {
     width: 850px;
     margin-left: auto;
     margin-right: auto;
