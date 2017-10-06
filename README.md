@@ -8,7 +8,7 @@ Running the Application
 
 Begin $FeedReader Testing Project by opening:
 
-	https://gabbygeo.github.io/NeighborhoodMap/  
+	https://gabbygeo.github.io/NeighborhoodMap/
 
 	or download the files here, unzip and run the index.html file in a web browser. 
 
