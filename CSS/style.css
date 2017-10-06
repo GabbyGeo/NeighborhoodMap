@@ -1,75 +1,113 @@
-.content {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.header__menu {
-  display: none;
-  }
-
 #map {
-  height: 100%; 
-}
-
-.options-box {
-  background-color: #6699ff;
-}
-
-
-@media screen and (max-width: 549px) {
-.header__title {
-    margin-left: 0;
-    font-size: 2em;
-    vertical-align: bottom; 
-  }
-.nav {
-    z-index: 10;
-    background-color: #fff;
-    width: 300px;
-    position: absolute;
-    /* This trasform moves the drawer off canvas. */
-    -webkit-transform: translate(-300px, 0);
-    transform: translate(-300px, 0);
-    /* Optionally, we animate the drawer. */
-    transition: transform 0.3s ease;
-  }
-  .nav.open {
-    -webkit-transform: translate(0, 0);
-    transform: translate(0, 0);
-  }
-  .nav__item {
-    display: list-item;
-    border-bottom: 1px solid #E0E0E0;
-    width: 100%;
-    text-align: left;
-  }
-.header__menu {
-    display: inline-block;
-    vertical-align: top;
-    position: absolute;
-    right: 0;
-    padding: 1em;
-  }
-  .header__menu svg {
-    width: 32px;
-    fill: #E0E0E0;
-  }
-  .form-group {
-    display: none;
-  }
-  .filter {
-    display: none;
-  }
-  .map {
+    bottom: 0px;
     height: 100%;
-  }
+    left: 0px;
+    position: absolute;
+    right: 0px;
 }
-
-@media screen and (min-width: 550px) {
-  main, .header__inner, .nav, .form-group, #map, .filter {
-    width: 850px;
+#over-map {
+    position: absolute;
+    z-index: 99;
+}
+.header__menu {
+    display: none;
+}
+.header__inner {
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
-  }
-  
+}
+.header__logo {
+    height: 150px;
+    width: 300px;
+    margin-right: 1em;
+    vertical-align: top;
+    position: absolute;
+}
+.header__title {
+    position: relative;
+    font-weight: 300;
+    font-size: 2em;
+    margin: 0.5em 0.25em;
+    left: 8px;
+    top: 20px;
+    color: white;
+    font-family: 'Architects Daughter', cursive;
+}
+.nav {
+    background: rgba(53, 64, 215, 0.5);
+    height: 50%;
+    line-height: 35px;
+    padding: 10px 10px 30px 10px;
+    text-align: left;
+    width: 280px;
+    margin-top: 120px;
+    font-family: 'Architects Daughter', cursive;
+    font-weight: bold;
+    color: white;
+}
+.form-control {
+    font-family: 'Architects Daughter', cursive;
+}
+@media screen and (max-width: 549px) {
+    .header__logo {
+        display: none;
+    }
+    .header__title {
+        font-size: 30px;
+        top: -15px;
+        left: -5px;
+        font-family: 'Architects Daughter', cursive;
+        color: black;
+    }
+    .nav {
+        z-index: 10;
+        background: rgba(53, 64, 215, 0.7);
+        width: 300px;
+        height: 385px;
+        font-family: 'Architects Daughter', cursive;
+        position: absolute;
+        /* This trasform moves the drawer off canvas. */
+        
+        -webkit-transform: translate(-300px, 0);
+        transform: translate(-300px, 0);
+        /* Optionally, we animate the drawer. */
+        
+        transition: transform 0.3s ease;
+    }
+    .nav.open {
+        -webkit-transform: translate(0, 0);
+        transform: translate(0, 0);
+    }
+    .nav__item {
+        width: 90%;
+        text-align: left;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .header__menu {
+        display: inline-block;
+        vertical-align: top;
+        position: absolute;
+        left: -20px;
+        margin-top: -35px;
+        padding: 1em;
+    }
+    .header__menu svg {
+        width: 32px;
+        fill: #E0E0E0;
+        background-color: black;
+        position: absolute;
+        z-index: 10;
+    }
+    #map {
+        height: 100%;
+    }
+    .infowindow {
+        height: 175px;
+    }
+    #over-map {
+        position: absolute;
+        z-index: 99;
+    }
 }
