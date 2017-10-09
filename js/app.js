@@ -1,4 +1,4 @@
- var map;
+  var map;
  var marker;
  var largeInfowindow;
  var bounds;
@@ -192,20 +192,19 @@
          // Push the marker to our array of markers.
          markers.push(marker);
          vm.locationsArray()[i].marker = marker;
-         // click handler for google maps marker
-         google.maps.event.addListener(marker, 'click', (function(location, vm) {
-             return function() {
+        // click handler for google maps marker
+         marker.addListener('click', self.clickActivate); 
+         bounds.extend(markers[i].position);
+         this.clickActivate = function (location, vm) {
+            return function() {
                  // tell viewmodel to show this place
                  map.setZoom(16);
                  map.setCenter(location.marker.getPosition());
                  vm.getVenues(location);
-
-             };
-         })(locations[i], vm));
-         bounds.extend(markers[i].position);
-     }
-
- }
+         }
+         }(locations[i], vm);
+       }
+    }
 
  var vm = new ViewModel();
  ko.applyBindings(vm);
