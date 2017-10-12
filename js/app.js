@@ -143,11 +143,11 @@
              self.scrollTo('#map');
          }).fail(function(err) {
              // if there is an error, set error status 
-             alert("Sorry, there is an error to view the information");
+             alert("Sorry, there is an error in viewing the information");
          });
      }).fail(function(err) {
          // if there is an error, set error status
-         alert("Sorry, there is an error to view the information");
+         alert("Sorry, there is an error in viewing the information");
      });
  }
  self.scrollTo = function(el) {
@@ -226,5 +226,11 @@
      };
  };
 
+ //error handling
+ mapError = () => {
+  alert("Sorry, there is a problem loading this page.  Please try again.");
+ };
+
  var vm = new ViewModel();
  ko.applyBindings(vm);
+
